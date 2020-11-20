@@ -10,19 +10,19 @@
 <button @click="Inverse()" class="btn">&#8543;x</button>
 <button @click="Square()" class="btn">x&#178;</button>
 <button @click="SquareRoot()" class="btn">&#8730;x</button>
-<button @click="Div()" class="btn">&#247;</button>
+<button @click="TakeOperator('÷')" class="btn">&#247;</button>
 <button @click="append('7')" class="btn">7</button>
 <button @click="append('8')" class="btn">8</button>
 <button @click="append('9')" class="btn">9</button>
-<button @click="Mul()" class="btn">&times;</button>
+<button @click="TakeOperator('X')" class="btn">&times;</button>
 <button @click="append('4')" class="btn">4</button>
 <button @click="append('5')" class="btn">5</button>
 <button @click="append('6')" class="btn">6</button>
-<button @click="Sub()" class="btn">&minus;</button>
+<button @click="TakeOperator('-')" class="btn">&minus;</button>
 <button @click="append('1')" class="btn">1</button>
 <button @click="append('2')" class="btn">2</button>
-<button @click="append('2')" class="btn">3</button>
-<button @click="Add()" class="btn">&plus;</button>
+<button @click="append('3')" class="btn">3</button>
+<button @click="TakeOperator('+')" class="btn">&plus;</button>
 <button @click="Plus_Minus()" class="btn">&#8314;/-</button>
 <button @click="append('0')" class="btn">0</button>
 <button @click="dot()" class="btn">.</button>
@@ -37,7 +37,6 @@
      return{
        current :'',
        previous :'',
-       result :'',
        operator :'',
        expression :'',
        isOperand : true,
@@ -48,10 +47,20 @@
   append(number){
     if(this.isOperand){
       this.current='';
+      this.expression = '';
       this.isOperand = false;
     }
-    this.current = `${this.current}${number}`;
-    this.expression = this.current;
+   this.current = `${this.current}${number}`;
+    this.expression = `${this.expression}${number}`;
+  },
+
+  TakeOperator(String){
+           if(this.operator === ''){
+            this.operator = String ;
+            this.expression = this.expression + " " + this.operator + " ";
+            this.previous = this.current;
+            this.current = '';
+           }   
   },
 
   dot(){
@@ -63,7 +72,13 @@
   del() {
       if(this.current)
         this.current = this.current.slice(0, -1);
-        this.expression = this.current;
+      if(this.expression.charAt(this.expression.length-1) === '+' || this.expression.charAt(this.expression.length-1) === '-'
+          || this.expression.charAt(this.expression.length-1) === 'X' || this.expression.charAt(this.expression.length-1) === '÷'){
+                  this.operator = '';
+                  this.isOperand = false;
+                  this.current = this.previous;
+       }
+         this.expression = this.expression.slice(0, -1);
     }, 
 
   clear(){
@@ -74,7 +89,6 @@
   // Single operation
 
  Percent(){
-        var reset = this.current;
         axios.get('http://localhost:8060/percent', {
           params: {
                 first: this.current
@@ -82,13 +96,11 @@
             })
           .then(function (response) {
             this.current=response.data;
-            this.expression =this.expression.replace(reset,this.current);
-            this.result=this.current
+            this.expression = this.expression + ")%" + " ";
           }.bind(this))
       },
 
   Inverse(){
-       var temp = this.current;
         axios.get('http://localhost:8060/inverse', {
           params: {
                 first: this.current
@@ -96,13 +108,11 @@
             })
           .then(function (response) {
             this.current=response.data;
-            this.expression =this.expression.replace(temp,this.current);
-            this.result=this.current
+            this.expression = this.expression + ")Pow(-1)" + " ";
           }.bind(this))
       },
 
   Plus_Minus(){
-        var temp = this.current;
         axios.get('http://localhost:8060/PM', {
           params: {
                 first: this.current
@@ -110,13 +120,11 @@
             })
           .then(function (response) {
             this.current=response.data;
-            this.expression =this.expression.replace(temp,this.current);
-            this.result=this.current
+            this.expression = this.expression + ")(-1)" + " ";
           }.bind(this))
   },
 
   Square(){
-        var temp = this.current;
         axios.get('http://localhost:8060/square', {
           params: {
                 first: this.current
@@ -124,13 +132,11 @@
             })
           .then(function (response) {
             this.current=response.data;
-            this.expression =this.expression.replace(temp,this.current);
-            this.result=this.current
+           this.expression = this.expression + ")²" + " ";
           }.bind(this))
   },
 
 SquareRoot(){
-      var temp = this.current;
         axios.get('http://localhost:8060/squareR', {
           params: {
                 first: this.current
@@ -138,41 +144,76 @@ SquareRoot(){
             })
           .then(function (response) {
             this.current=response.data;
-            this.expression =this.expression.replace(temp,this.current);
-            this.result=this.current
+            this.expression = this.expression + ")√" + " ";
           }.bind(this))
 },
 
 // Double operation
-  
-    Add(){
-      axios.get('http://localhost:8060/add', {
-    params: {
-      first : "5",
-      second : "3",
-    }
-  })
-  .then(function (response) {
-    console.log(response.data);
-  }.bind())
+
+ Add(){      
+             axios.get('http://localhost:8060/add', {
+           params: {
+              first : this.previous,
+              second : this.current,
+      }
+    })
+          .then(function (response) {
+             this.current=response.data; 
+      }.bind(this))
     },
 
-   Sub(){
+  Sub(){
+         axios.get('http://localhost:8060/sub', {
+           params: {
+              first : this.previous,
+              second : this.current,
+      }
+    })
+          .then(function (response) {
+             this.current=response.data; 
+      }.bind(this))
+  },
 
-   },
-
-   Mul(){
-
-   },
+  Mul(){
+         axios.get('http://localhost:8060/mul', {
+           params: {
+              first : this.previous,
+              second : this.current,
+      }
+    })
+          .then(function (response) {
+             this.current=response.data; 
+      }.bind(this))
+  },
 
   Div(){
-
+       axios.get('http://localhost:8060/div', {
+           params: {
+              first : this.previous,
+              second : this.current,
+      }
+    })
+          .then(function (response) {
+             this.current=response.data; 
+      }.bind(this))
   },
-   
+
   // show result
 
    Equale(){
-     
+     if(this.operator === '+'){
+          this.Add();
+       }
+    else if(this.operator === '-'){
+      this.Sub();
+    }
+   else if(this.operator === 'X'){
+     this.Mul();
+   }
+   else if(this.operator === '÷'){
+       this.Div();
+   }
+   this.operator = ''; 
    },
     
    }
@@ -190,6 +231,8 @@ SquareRoot(){
      grid-auto-rows: minmax(30px,auto);
      margin: 0 auto;
      background-color: rgb(80, 9, 62);
+     border-color: palevioletred;
+     border-style: solid;
     }
 
 .display1{
@@ -197,7 +240,6 @@ SquareRoot(){
    border-color: palevioletred;
    border-style: solid;
    height: 40px;
-   padding: 5px;
    opacity:0.5;
    font-size:30px ;
 }
@@ -210,16 +252,38 @@ SquareRoot(){
      grid-column: 1/5;  
      background-color: rgb(80, 9, 62);
      color: silver;
-     overflow: hidden;
+     overflow: auto;
+     padding: 5px;
 }
 
+/* width */
+::-webkit-scrollbar {
+  width: 20px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey; 
+  border-radius: 10px;
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgb(173, 2, 116); 
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #750262; 
+}
   .btn{
     border: 1px solid rgba(139, 42, 118, 0.452);
     font-size: 20px;
     color: rgb(80, 9, 62);
     background: rgb(241, 162, 241); 
     outline: none; 
-    margin: 3px;
+    margin:2px;
     font-weight: bold;
   } 
 .btn:hover{
