@@ -26,7 +26,7 @@
 <button @click="Plus_Minus()" class="btn">&#8314;/-</button>
 <button @click="append('0')" class="btn">0</button>
 <button @click="dot()" class="btn">.</button>
-<button @click="Equale()" class="btn">&equals;</button>
+<button @click="Equal()" class="btn">&equals;</button>
 </div>
 </template>
 
@@ -39,7 +39,7 @@
        previous :'',
        operator :'',
        expression :'',
-       isOperand : true,
+       isOperand :true,
      }
    },
    methods:{
@@ -136,7 +136,7 @@
           }.bind(this))
   },
 
-SquareRoot(){
+  SquareRoot(){
         axios.get('http://localhost:8060/squareR', {
           params: {
                 first: this.current
@@ -200,7 +200,7 @@ SquareRoot(){
 
   // show result
 
-   Equale(){
+   Equal(){
      if(this.operator === '+'){
           this.Add();
        }
@@ -221,7 +221,6 @@ SquareRoot(){
 </script>
 
 <style>
-
    #calc{
      display: grid;
      font-size: 50px ;
@@ -234,7 +233,6 @@ SquareRoot(){
      border-color: palevioletred;
      border-style: solid;
     }
-
 .display1{
     text-align: left;  
    border-color: palevioletred;
@@ -243,11 +241,9 @@ SquareRoot(){
    opacity:0.5;
    font-size:30px ;
 }
-
  .display{
    text-align: right;
  }
-
 .display , .display1{
      grid-column: 1/5;  
      background-color: rgb(80, 9, 62);
@@ -255,24 +251,20 @@ SquareRoot(){
      overflow: auto;
      padding: 5px;
 }
-
 /* width */
 ::-webkit-scrollbar {
   width: 20px;
 }
-
 /* Track */
 ::-webkit-scrollbar-track {
   box-shadow: inset 0 0 5px grey; 
   border-radius: 10px;
 }
- 
 /* Handle */
 ::-webkit-scrollbar-thumb {
   background: rgb(173, 2, 116); 
   border-radius: 10px;
 }
-
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #750262; 
@@ -289,6 +281,5 @@ SquareRoot(){
 .btn:hover{
     color:rgb(241, 162, 241);
     background: rgb(80, 9, 62); 
-}
-
+  }
 </style>
